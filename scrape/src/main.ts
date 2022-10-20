@@ -9,7 +9,7 @@ import { env } from 'process';
 const { TARGET, PASSWORD, EMAIL } = env;
 
 const CLICK_DELAY = 2_000;
-const TYPE_DELAY = 200;
+const TYPE_DELAY = 100;
 
 const justWait = (seconds:number) => new Promise(r => setTimeout(r, seconds * 1000));
 
@@ -21,14 +21,16 @@ const justWait = (seconds:number) => new Promise(r => setTimeout(r, seconds * 10
         PASSWORD != undefined
 
     if (areAllEnvDefined) {
-        const url = new URL('/mijn/inloggen', TARGET)
+        const loginUrl = new URL('/mijn/inloggen', TARGET)
         
         const browser = await puppeteer.launch({
             headless: false
         });
             
         const page = await browser.newPage()
-        await page.goto(url.toString(), { waitUntil: "networkidle2" })
+
+        // Login
+        await page.goto(loginUrl.toString(), { waitUntil: "networkidle2" })
 
         await page.click(
             "#CybotCookiebotDialogBodyLevelButtonCustomize",
@@ -50,9 +52,22 @@ const justWait = (seconds:number) => new Promise(r => setTimeout(r, seconds * 10
         await Promise.all([
             page.waitForNavigation({ waitUntil: "networkidle2" }),
             page.waitForNavigation({ waitUntil: "load" }),
-            justWait(10)
+            justWait(5)
         ])
-    
+
+        // Access consumption data
+        const consumptionUrl = new URL("/mijn/verbruiksoverzicht", TARGET)
+        
+        const [response] = await Promise.all([
+            page.goto(consumptionUrl.toString(), { waitUntil: 'networkidle2' }),
+            justWait(10),
+            page.select(".h-full.w-full.rounded.py-2.pl-3.pr-14", "days"),
+            // page.waitForResponse(response => response.url())
+        ])
+
+
+        // Done
         await browser.close()
+
     } else { throw new Error("You need to set all URL, EMAIL, and PASSWORD in .env") }
 })();
