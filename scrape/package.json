@@ -21,5 +21,11 @@
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist build",
     "ts-node": "ts-node"
-}
+  },
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/puppeteer": "^5.4.7",
+    "dotenv": "^16.0.3",
+    "puppeteer": "^19.0.0"
+  }
 }
