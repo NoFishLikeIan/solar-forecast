@@ -291,4 +291,4 @@ cython_debug/
 #.idea/
 
 # Package specifics
-data/
+data/consumption
